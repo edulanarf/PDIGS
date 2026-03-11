@@ -1,12 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { FoodDB} from '../EasyDiet/foodDB.js';
+import { FoodAPI} from './foodAPI.js';
 
 export default function App() {
 
   return (
     <View style={styles.container}>
-      <FoodDB />
+      <FoodAPI />
       <StatusBar style="auto" />
     </View>
   );

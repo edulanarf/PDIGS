@@ -1,0 +1,77 @@
+import { useEffect, useState } from "react";
+import {Text, View, StyleSheet } from 'react-native';
+
+// Esto es un ejemplo de como buscar un producto con el codigo de barras:
+
+export function FoodAPI(){
+
+    // - useState crea un estado dentro del componente
+    // - food guarda el alimento actual
+    // - setFood es la función que permite actualizar ese valor
+    // - cuando se llama a setFood React vuelve a renderizar la interfaz
+    // - Si se asignase una variable normal, react no detecta el cambio por
+    // lo que no rederizaría la interfaz. Mejor siempre hacerlo asi:
+
+    const [food, setFood] = useState(null) 
+
+    // useEffect hace que cuando se cree el componente FoodDB, se ejecute.
+
+    useEffect(()=> {
+
+        // Como useEffect no puede ser asyncrona creo una funcion para ello:
+
+        const getFirstFood = async ()=> {
+        try{
+            //El siguiente enlace indica un producto a través del codigo de barras (product/numero)
+            
+            const response = await fetch("https://world.openfoodfacts.net/api/v2/product/3017624010701")
+            const data = await response.json();
+            if(data.product) {
+                //Como comenté al principio, este método le asigna un valor a la variable food
+                //data.product sería el producto con el numero 3017624010701 (en este caso nutella)
+                setFood(data.product)
+            }
+        }
+        catch(error){
+            console.error("error:" ,error)
+        }
+    };
+    getFirstFood()
+},[])
+
+  // En caso de no haberse encontrado un producto:
+  if (!food) {
+    return (
+      <View style={styles.container}>
+        <Text>Cargando primer alimento...</Text>
+      </View>
+    );
+  }
+
+  //si se encuentra muestra lo siguiente (json):
+return (
+  <View>
+    <Text>{food.product_name}</Text>
+    <Text>Marca: {food.brands}</Text>
+    <Text>Calorías: {food.nutriments?.["energy-kcal_100g"] ?? "N/A"}</Text>
+  </View>
+);
+}
+
+// Esto es como el ccs pero en este caso se hace dentro del mismo js, asignando
+// una variable "styles a la que luego se puede hacer por ejemplo
+// styles.container ...":
+
+const styles = StyleSheet.create({
+  container: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: 20 
+  },
+  title: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    marginBottom: 10 
+  },
+});

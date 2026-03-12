@@ -3,7 +3,7 @@ import {Text, View, StyleSheet } from 'react-native';
 
 // Esto es un ejemplo de como buscar un producto con el codigo de barras:
 
-export function FoodAPI(){
+export function FoodAPIBarcode(){
 
     // - useState crea un estado dentro del componente
     // - food guarda el alimento actual
@@ -13,6 +13,7 @@ export function FoodAPI(){
     // lo que no rederizaría la interfaz. Mejor siempre hacerlo asi:
 
     const [food, setFood] = useState(null) 
+    const barcode = "3017624010701";
 
     // useEffect hace que cuando se cree el componente FoodDB, se ejecute.
 
@@ -24,7 +25,7 @@ export function FoodAPI(){
         try{
             //El siguiente enlace indica un producto a través del codigo de barras (product/numero)
             
-            const response = await fetch("https://world.openfoodfacts.net/api/v2/product/3017624010701")
+            const response = await fetch(`https://world.openfoodfacts.net/api/v2/product/${barcode}`)
             const data = await response.json();
             if(data.product) {
                 //Como comenté al principio, este método le asigna un valor a la variable food

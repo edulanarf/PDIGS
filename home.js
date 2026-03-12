@@ -3,8 +3,6 @@ import {Text, View, Button } from 'react-native';
 export function Home({navigation}){
     return (
     <View>
-      <Text>Bienvenido a EasyDiet</Text>
-
       <Button
         title="Register"
         onPress={() => navigation.navigate("Register")}

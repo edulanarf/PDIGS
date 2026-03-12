@@ -2,7 +2,7 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {auth} from '../db/firebase.js'
 import { useState } from "react";
-import { Button, TextInput, Text } from "react-native-web";
+import { View, TextInput, Text, Button, StyleSheet } from "react-native";
 
 export function Register(){
     const [email, setEmail] = useState("")
@@ -27,12 +27,22 @@ export function Register(){
     }
 
     return (
-        <view>
+        <View style={styles.container}>
             <Text>Register</Text>
-            <TextInput placeholder="Email" value={email}></TextInput>
-            <TextInput placeholder="Password" value={password}></TextInput>
-            <Button title="Register" onPress={handleRegister}></Button>
-        </view>
+            <TextInput placeholder="Email" value={email} onChangeText={setEmail}></TextInput>
+            <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true}></TextInput>
+            <Button title="Register" onPress={handleRegister} ></Button>
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import {Text, View, StyleSheet } from 'react-native';
 
 
-// Esto es un ejemplo de como buscar un producto con el codigo de barras:
+// Esta funcion hace una llamada a la API de openfoodfacts usando el valor del codigo de barras
+// Conseguido mediante la funcion "barcodeScanner".
 
 export function FoodAPIBarcode({barcode}){
 
@@ -15,14 +16,16 @@ export function FoodAPIBarcode({barcode}){
 
     const [food, setFood] = useState(null) 
 
-    // useEffect hace que cuando se cree el componente FoodDB, se ejecute.
+    //En caso de no haber valor del barcode:
     if (!barcode) {
       return (
         <View style={styles.container}>
           <Text>Esperando código de barras...</Text>
         </View>
       );
-    } 
+    }
+    
+    // useEffect hace que cuando se cree el componente FoodDB, se ejecute.
     useEffect(()=> {
 
         // Como useEffect no puede ser asyncrona creo una funcion para ello:
@@ -35,7 +38,7 @@ export function FoodAPIBarcode({barcode}){
             const data = await response.json();
             if(data.product) {
                 //Como comenté al principio, este método le asigna un valor a la variable food
-                //data.product sería el producto con el numero 3017624010701 (en este caso nutella)
+                //data.product sería el producto que se añade a la variable "food"
                 setFood(data.product)
             }
         }

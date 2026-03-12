@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Text, View, StyleSheet } from 'react-native';
+import {Text, View, StyleSheet, Image  } from 'react-native';
 
 
 // Esta funcion hace una llamada a la API de openfoodfacts usando el valor del codigo de barras
@@ -58,13 +58,72 @@ export function FoodAPIBarcode({barcode}){
     );
   }
 
+  // Mostrar los macros de 100g o del producto completo (si el json tiene la cantidad del mismo claro):
+const kcal100 = food.nutriments?.["energy-kcal_100g"] ?? 0;
+const protein100 = food.nutriments?.["proteins_100g"] ?? 0;
+const carbs100 = food.nutriments?.["carbohydrates_100g"] ?? 0;
+const fat100 = food.nutriments?.["fat_100g"] ?? 0;
+const salt100 = food.nutriments?.["salt_100g"] ?? 0;
+const sugar100 = food.nutriments?.["sugars_100g"] ?? 0;
+
+let weight = null;
+
+// En ocasiones el producto tiene product_quantity, quantity o ni tiene, en los dos primeros casos se
+// muestra los macros del producto entero (abajo) pero cuando weight es null no se muestra.(abajo tamb)
+if (food.product_quantity) {
+  weight = parseFloat(food.product_quantity);
+} else if (food.quantity) {
+  const match = food.quantity.match(/[\d.]+/);
+  if (match) weight = parseFloat(match[0]);
+}
+
+const kcalTotal = (kcal100 * weight) / 100;
+const proteinTotal = (protein100 * weight) / 100;
+const carbsTotal = (carbs100 * weight) / 100;
+const fatTotal = (fat100 * weight) / 100;
+const saltTotal = (salt100 * weight) / 100;
+const sugarTotal = (sugar100 * weight) / 100;
   //si se encuentra muestra lo siguiente (json):
 return (
-  <View>
-    <Text>{food.product_name}</Text>
-    <Text>Marca: {food.brands}</Text>
-    <Text>Calorías: {food.nutriments?.["energy-kcal_100g"] ?? "N/A"}</Text>
-  </View>
+<View>
+    {food.image_front_url && (
+    <Image
+      source={{ uri: food.image_front_url }}
+      style={{ width: 150, height: 150, marginBottom: 10 }}
+      resizeMode="contain"
+    />
+  )}
+  <Text>{food.product_name}</Text>
+  <Text>Marca: {food.brands}</Text>
+
+  <Text>--- Por 100g / 100ml ---</Text>
+  <Text>Calorías: {kcal100}</Text>
+  <Text>Proteínas: {protein100} g</Text>
+  <Text>Carbohidratos: {carbs100} g</Text>
+  <Text>Grasas: {fat100} g</Text>
+  <Text>Sal: {salt100} g</Text>
+  <Text>Azúcar: {sugar100} g</Text>
+
+  {weight ? (
+    <>
+      <Text>--- Producto completo ({food.quantity ?? weight}) ---</Text>
+      <Text>Calorías: {kcalTotal.toFixed(1)}</Text>
+      <Text>Proteínas: {proteinTotal.toFixed(1)} g</Text>
+      <Text>Carbohidratos: {carbsTotal.toFixed(1)} g</Text>
+      <Text>Grasas: {fatTotal.toFixed(1)} g</Text>
+      <Text>Sal: {saltTotal.toFixed(1)} g</Text>
+      <Text>Azúcar: {sugarTotal.toFixed(1)} g</Text>
+    </>
+  ) : (
+    <>
+      <Text>--- Producto completo ---</Text>
+      <Text>Tamaño del producto no disponible en la base de datos</Text>
+    </>
+  )}
+
+</View>
+
+  
 );
 }
 

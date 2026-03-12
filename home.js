@@ -1,6 +1,20 @@
 import {Text, View, Button } from 'react-native';
+import { auth } from './db/firebase.js'
 
 export function Home({navigation}){
+    //Compruebo si el usuario esta log para el boton de "Dietas"
+
+    const handleCrearDieta = () => {
+        const user = auth.currentUser; // verifica si hay usuario logueado
+
+        if (user) {
+        // Usuario logueado ir al CRUD de dietas
+        navigation.navigate("Dietas");
+        } else {
+        navigation.navigate("Login")
+        }
+  };
+
     return (
     <View>
       <Button
@@ -19,10 +33,7 @@ export function Home({navigation}){
         title="Buscar comida escribiendo"
         onPress={() => navigation.navigate("SearchFood")}
       />
-      <Button
-        title="Home"
-        onPress={() => navigation.navigate("Home")}
-      />
+      <Button title="Dietas" onPress={handleCrearDieta} />
     </View>
     )
 }

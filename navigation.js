@@ -6,6 +6,8 @@ import{SearchFood } from './db/searchFood.js';
 import { Register } from './user/register.js';
 import { Login } from './user/login.js';
 import {Home} from './home.js'
+import {CrudDiet} from './CRUD/crudDieta.js';
+import {CreateDiet} from './CRUD/createDiet.js'
 
 
 const Stack = createNativeStackNavigator();
@@ -19,6 +21,8 @@ export function Navigation(){
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Scaner" component={ScanAndSearch} ></Stack.Screen>
                 <Stack.Screen name="SearchFood" component={SearchFood} ></Stack.Screen>
+                <Stack.Screen name="Dietas" component={CrudDiet} ></Stack.Screen>
+                <Stack.Screen name="Creating Diet" component={CreateDiet} ></Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
     )

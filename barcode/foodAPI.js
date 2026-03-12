@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import {Text, View, StyleSheet } from 'react-native';
 
+
 // Esto es un ejemplo de como buscar un producto con el codigo de barras:
 
-export function FoodAPIBarcode(){
+export function FoodAPIBarcode({barcode}){
 
     // - useState crea un estado dentro del componente
     // - food guarda el alimento actual
@@ -13,15 +14,20 @@ export function FoodAPIBarcode(){
     // lo que no rederizaría la interfaz. Mejor siempre hacerlo asi:
 
     const [food, setFood] = useState(null) 
-    const barcode = "3017624010701";
 
     // useEffect hace que cuando se cree el componente FoodDB, se ejecute.
-
+    if (!barcode) {
+      return (
+        <View style={styles.container}>
+          <Text>Esperando código de barras...</Text>
+        </View>
+      );
+    } 
     useEffect(()=> {
 
         // Como useEffect no puede ser asyncrona creo una funcion para ello:
 
-        const getFirstFood = async ()=> {
+        const getProduct = async ()=> {
         try{
             //El siguiente enlace indica un producto a través del codigo de barras (product/numero)
             
@@ -37,8 +43,8 @@ export function FoodAPIBarcode(){
             console.error("error:" ,error)
         }
     };
-    getFirstFood()
-},[])
+    getProduct()
+},[barcode])
 
   // En caso de no haberse encontrado un producto:
   if (!food) {

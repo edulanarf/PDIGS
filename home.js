@@ -8,8 +8,12 @@ export function Home({navigation}){
         onPress={() => navigation.navigate("Register")}
       />
       <Button
+        title="Login"
+        onPress={() => navigation.navigate("Login")}
+      />
+      <Button
         title="Buscar comida API (codigo barras)"
-        onPress={() => navigation.navigate("ApiFood")}
+        onPress={() => navigation.navigate("Scaner")}
       />
       <Button
         title="Buscar comida escribiendo"

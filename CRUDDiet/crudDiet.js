@@ -35,6 +35,7 @@ export function CrudDiet({navigation}){
         <Text>MY DIETS</Text>
             {diets.map((diet) => (
                 <Button
+                key={diet.id}
                 title={diet.id}
                 onPress={() => console.log("Dieta seleccionada:", diet.id)}
             />

@@ -6,8 +6,8 @@ import{SearchFood } from './db/searchFood.js';
 import { Register } from './user/register.js';
 import { Login } from './user/login.js';
 import {Home} from './home.js'
-import {CrudDiet} from './CRUD/crudDieta.js';
-import {CreateDiet} from './CRUD/createDiet.js'
+import {CrudDiet} from './CRUDDiet/crudDiet.js';
+import {CreateDiet} from './CRUDDiet/createDiet.js'
 
 
 const Stack = createNativeStackNavigator();

@@ -2,9 +2,10 @@
 import { signInWithEmailAndPassword  } from "firebase/auth";
 import {auth} from '../db/firebase.js'
 import { useState } from "react";
-import { View, TextInput, Text, Button, StyleSheet } from "react-native";
+import { View, TextInput, Text, Button, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 
-export function Login(){
+
+export function Login({navigation}){
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -20,6 +21,7 @@ export function Login(){
             console.log(`el usuario ${user.email} ha iniciado sesion`)
             setEmail("")
             setPassword("")
+            navigation.navigate("Home");
         }
         catch(error){
             console.error(error)
@@ -27,12 +29,14 @@ export function Login(){
     }
 
     return (
-        <View style={styles.container}>
-            <Text>Login</Text>
-            <TextInput placeholder="Email" value={email} onChangeText={setEmail}></TextInput>
-            <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true}></TextInput>
-            <Button title="Login" onPress={handleRegister} ></Button>
-        </View>
+        <KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <View style={styles.container}>
+                <Text>Login</Text>
+                <TextInput placeholder="Email" value={email} onChangeText={setEmail}></TextInput>
+                <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={true}></TextInput>
+                <Button title="Login" onPress={handleRegister} ></Button>
+            </View>
+        </KeyboardAvoidingView>
     );
 }
 

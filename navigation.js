@@ -7,7 +7,8 @@ import { Register } from './user/register.js';
 import { Login } from './user/login.js';
 import {Home} from './home.js'
 import {CrudDiet} from './CRUDDiet/crudDiet.js';
-import {CreateDiet} from './CRUDDiet/createDiet.js'
+import {CreateDiet} from './CRUDDiet/createDiet.js';
+import { SetObjective } from './goals/setObjective.js'
 
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +24,7 @@ export function Navigation(){
                 <Stack.Screen name="SearchFood" component={SearchFood} ></Stack.Screen>
                 <Stack.Screen name="Dietas" component={CrudDiet} ></Stack.Screen>
                 <Stack.Screen name="Creating Diet" component={CreateDiet} ></Stack.Screen>
+                <Stack.Screen name="SetObjective" component={SetObjective} />
             </Stack.Navigator>
         </NavigationContainer>
     )

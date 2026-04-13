@@ -82,6 +82,15 @@ export function Home({ navigation }) {
           <Text style={styles.textoBoton}>Dietas</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.boton}
+          onPress={() => navigation.navigate("SetObjective")}
+        >
+          <FontAwesome5 name="check-double" size={24} color="white" />
+          <Text style={styles.textoBoton}>Marcar Objetivo</Text>
+        </TouchableOpacity>
+
+
       </View>
     </ScrollView>
   );

@@ -1,18 +1,19 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
-import { Home } from "./home.js";
-
-import { Register } from "./user/register.js";
-import { Login } from "./user/login.js";
-import { ScanAndSearch } from "./barcode/scanAndSearch.js";
-import { SearchFood } from "./db/searchFood.js";
-
-import { CrudDiet } from "./CRUDDiet/crudDiet.js";
-import { CreateDiet } from "./CRUDDiet/createDiet.js";
-import { ViewDiet } from "./CRUDDiet/viewDiet.js";
+import { ScanAndSearch} from './barcode/scanAndSearch.js';
+import{SearchFood } from './db/searchFood.js';
+import { Register } from './user/register.js';
+import { Login } from './user/login.js';
+import {Home} from './home.js'
+import {CrudDiet} from './CRUDDiet/crudDiet.js';
+import {CreateDiet} from './CRUDDiet/createDiet.js'
+import {ViewDiet} from './CRUDDiet/viewDiet.js';
+import {DeleteDiet} from './CRUDDiet/deleteDiet.js';
 import { EditDiet } from "./CRUDDiet/editDiet.js";
-import { DeleteDiet } from "./CRUDDiet/deleteDiet.js";
+import { SetObjective } from './goals/setObjective.js'
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,8 @@ export function Navigation() {
         <Stack.Screen name="EditDiet" component={EditDiet} options={{ title: "Editar Dieta" }} />
 
         <Stack.Screen name="DeleteDiet" component={DeleteDiet} options={{ title: "Eliminar Dieta" }} />
+
+        <Stack.Screen name="SetObjective" component={SetObjective} options={{ title: "Marcar Objetivo" }} />
 
       </Stack.Navigator>
     </NavigationContainer>

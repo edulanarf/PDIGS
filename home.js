@@ -1,90 +1,116 @@
-import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { auth } from './db/firebase.js';
+import React from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+
+import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { auth } from "./db/firebase.js";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 
 export function Home({ navigation }) {
-
   const caloriasConsumidas = 1200;
   const caloriasObjetivo = 2000;
 
   const porcentaje = (caloriasConsumidas / caloriasObjetivo) * 100;
 
-  const handleCrearDieta = () => {
-    const user = auth.currentUser;
-
-    if (user) {
-      navigation.navigate("Dietas");
-    } else {
-      navigation.navigate("Login");
-    }
-  };
-
   return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Text style={styles.appName}>Easy Diet</Text>
 
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-
-      {/* 🔹 Botón arriba derecha */}
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => navigation.navigate("Objetivos")}>
-          <Text style={styles.objetivosBtn}>⚙️</Text>
+        <TouchableOpacity
+          onPress={() =>
+            auth.currentUser
+              ? navigation.navigate("Objetivos")
+              : navigation.navigate("Login")
+          }
+        >
+          <Ionicons name="settings-outline" size={24} color="#185FA5" />
         </TouchableOpacity>
       </View>
 
-      {/* 🔹 Gráfica semicircular */}
-      <View style={styles.graficaContainer}>
+      {/* HERO / PROGRESS */}
+      <View style={styles.hero}>
         <AnimatedCircularProgress
-          size={200}
-          width={20}
+          size={220}
+          width={18}
           fill={porcentaje}
-          tintColor="#00e0ff"
-          backgroundColor="#3d5875"
+          tintColor="#185FA5"
+          backgroundColor="#E6F1FB"
           rotation={-90}
-          arcSweepAngle={180} // 🔥 esto hace el semicirculo
+          arcSweepAngle={180}
         >
-          {
-            () => (
-              <Text style={styles.caloriasText}>
-                {caloriasConsumidas} / {caloriasObjetivo} kcal
+          {() => (
+            <View style={{ alignItems: "center" }}>
+              <Text style={styles.caloriesBig}>
+                {caloriasConsumidas}
               </Text>
-            )
-          }
+              <Text style={styles.caloriesSub}>
+                / {caloriasObjetivo} kcal
+              </Text>
+            </View>
+          )}
         </AnimatedCircularProgress>
       </View>
 
-      {/* 🔹 Botones principales */}
-      <View style={styles.botonesContainer}>
-
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Register")}>
-          <Text style={styles.textoBoton}>Register</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.textoBoton}>Login</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Scaner")}>
-          <Ionicons name="camera" size={28} color="white" />
-          <Text style={styles.textoBoton}>Escanear comida</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("SearchFood")}>
-          <Ionicons name="search" size={28} color="white" />
-          <Text style={styles.textoBoton}>Buscar comida</Text>
+      {/* ACTIONS */}
+      <View style={styles.grid}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("Scaner")}
+        >
+          <Ionicons name="camera" size={28} color="#185FA5" />
+          <Text style={styles.cardText}>Scan food</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.boton}
-          onPress={() => navigation.navigate("Dietas")}
+          style={styles.card}
+          onPress={() => navigation.navigate("SearchFood")}
         >
-          <FontAwesome5 name="file-alt" size={24} color="white" />
-          <Text style={styles.textoBoton}>Dietas</Text>
+          <Ionicons name="search" size={28} color="#185FA5" />
+          <Text style={styles.cardText}>Search food</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("Dietas")}
+        >
+          <FontAwesome5 name="utensils" size={24} color="#185FA5" />
+          <Text style={styles.cardText}>Diets</Text>
+        </TouchableOpacity>
 
-
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate("SetObjective")}
+        >
+          <FontAwesome5 name="plus" size={24} color="#185FA5" />
+          <Text style={styles.cardText}>New diet</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* LOGIN CTA (solo si no está logueado) */}
+      {!auth.currentUser && (
+        <TouchableOpacity
+          style={styles.loginCard}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Ionicons name="log-in-outline" size={20} color="#185FA5" />
+          <Text style={styles.loginText}>
+            Sign in to save your progress
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      <View style={{ height: 30 }} />
     </ScrollView>
   );
 }
@@ -92,68 +118,84 @@ export function Home({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+
+  content: {
     padding: 20,
-    backgroundColor: "#0f172a",
+    paddingTop: 28,
   },
 
-  topBar: {
-    alignItems: "flex-end",
-    marginBottom: 10,
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
 
-  objetivosBtn: {
-    fontSize: 24,
-    color: "white",
+  appName: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#185FA5",
   },
 
-  graficaContainer: {
+  hero: {
     alignItems: "center",
     marginVertical: 20,
   },
 
-  caloriasText: {
-    color: "white",
-    fontSize: 16,
+  caloriesBig: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#185FA5",
   },
 
-botonesContainer: {
-  marginTop: 20,
-  flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-},
+  caloriesSub: {
+    fontSize: 14,
+    color: "#888",
+  },
 
-boton: {
-  backgroundColor: "#2563eb",
-  width: "48%",
-  aspectRatio: 1,
-  borderRadius: 20,
-  marginBottom: 15,
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 8,
-  alignSelf: "center"
-},
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
 
-  botonesCRUD: {
-  flexDirection: "row",
-  justifyContent: "space-center",
-  marginTop: 10,
-},
+  card: {
+    width: "48%",
+    aspectRatio: 1,
+    backgroundColor: "#E6F1FB",
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#B5D4F4",
+  },
 
-  botonCRUD: {
-  backgroundColor: "#10b981",
-  width: "48%",
-  aspectRatio: 1,
-  borderRadius: 20,
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 8
-},
+  cardText: {
+    marginTop: 8,
+    color: "#185FA5",
+    fontWeight: "600",
+    fontSize: 13,
+  },
 
-  textoBoton: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+  loginCard: {
+    marginTop: 20,
+    padding: 14,
+    backgroundColor: "#E6F1FB",
+    borderRadius: 12,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#B5D4F4",
+  },
+
+  loginText: {
+    color: "#185FA5",
+    fontWeight: "600",
   },
 });

@@ -21,6 +21,7 @@ const BLUE_MID = "#378ADD";
 export function CreateDiet() {
 
 const uid = auth.currentUser?.uid;
+const [objetivo, setObjetivo] = useState("");
 
 const [name, setName] = useState("");
 const [calorias, setCalorias] = useState("");
@@ -56,6 +57,8 @@ if (!snap.exists()) return;
 const data = snap.data();
 
 if (!data.dailyCalorieTarget) return;
+
+setObjetivo(data.goal || "");
 
 const calories = data.dailyCalorieTarget;
 
@@ -107,6 +110,7 @@ calorias: Number(calorias),
 proteinas: Number(proteinas),
 grasas: Number(grasas),
 carbohidratos: Number(carbohidratos),
+objetivo: objetivo,
 
 restricciones: restricciones.split(",").map(x=>x.trim()),
 alimentosProhibidos: prohibidos.split(",").map(x=>x.trim()),

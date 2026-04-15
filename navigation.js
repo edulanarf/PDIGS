@@ -36,7 +36,7 @@ export function Navigation() {
 
         <Stack.Screen name="CreateDiet" component={CreateDiet} options={{ title: "Crear Dieta" }} />
 
-        <Stack.Screen name="ViewDiet" component={ViewDiet} options={{ title: "Ver Dietas" }} />
+        <Stack.Screen name="ViewDiet" component={ViewDiet} options={{ title: "Diets" }} />
 
         <Stack.Screen name="EditDiet" component={EditDiet} options={{ title: "Editar Dieta" }} />
 

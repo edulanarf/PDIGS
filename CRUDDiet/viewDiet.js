@@ -7,9 +7,8 @@ const BLUE = "#185FA5";
 const BLUE_LIGHT = "#E6F1FB";
 const BLUE_MID = "#378ADD";
 
-export function ViewDiet() {
+export function ViewDiet({navigation}) {
   const [dietas, setDietas] = useState([]);
-  const [selected, setSelected] = useState(null);
 
   const load = async (uid) => {
     const snap = await getDocs(collection(db, `users/${uid}/dietas`));
@@ -43,11 +42,13 @@ export function ViewDiet() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => {
-          const active = selected?.id === item.id;
+          const active = false
 
           return (
             <TouchableOpacity
-              onPress={() => setSelected(item)}
+              onPress={() => navigation.navigate("DietPage", {
+              dietId: item.id
+            })}
               style={[
                 styles.card,
                 active && styles.cardActive
@@ -64,39 +65,6 @@ export function ViewDiet() {
           );
         }}
       />
-
-      {/* DETALLE */}
-      {selected && (
-        <View style={styles.detailCard}>
-          <Text style={styles.detailTitle}>Diet details</Text>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Calories</Text>
-            <Text style={styles.detailValue}>{selected.calorias}</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Protein</Text>
-            <Text style={styles.detailValue}>{selected.proteinas} g</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Fat</Text>
-            <Text style={styles.detailValue}>{selected.grasas} g</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Carbs</Text>
-            <Text style={styles.detailValue}>{selected.carbohidratos} g</Text>
-          </View>
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Goal</Text>
-            <Text style={styles.detailValue}>{selected.objetivo}</Text>
-          </View>
-        </View>
-      )}
-
     </View>
   );
 }

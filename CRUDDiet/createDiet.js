@@ -13,12 +13,13 @@ Alert
 import { db,auth } from "../db/firebase.js";
 import { setDoc, doc, serverTimestamp,getDoc } from "firebase/firestore";
 
+
 // 🎨 mismos colores del SetObjective
 const BLUE = "#185FA5";
 const BLUE_LIGHT = "#E6F1FB";
 const BLUE_MID = "#378ADD";
 
-export function CreateDiet() {
+export function CreateDiet({navigation}) {
 
 const uid = auth.currentUser?.uid;
 const [objetivo, setObjetivo] = useState("");
@@ -129,6 +130,10 @@ dieta
 );
 
 Alert.alert("Guardado","Dieta creada correctamente");
+
+navigation.navigate("DietPage", {
+  dietId: dieta.name
+});
 
 } catch(error) {
 

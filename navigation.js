@@ -12,6 +12,7 @@ import {ViewDiet} from './CRUDDiet/viewDiet.js';
 import {DeleteDiet} from './CRUDDiet/deleteDiet.js';
 import { EditDiet } from "./CRUDDiet/editDiet.js";
 import { SetObjective } from './goals/setObjective.js'
+import {DietPage} from "./Diet/DietPage.js"
 
 
 
@@ -43,6 +44,8 @@ export function Navigation() {
         <Stack.Screen name="DeleteDiet" component={DeleteDiet} options={{ title: "Eliminar Dieta" }} />
 
         <Stack.Screen name="SetObjective" component={SetObjective} options={{ title: "Marcar Objetivo" }} />
+
+        <Stack.Screen name="DietPage" component={DietPage} options={{ title: "Diet" }} />
 
       </Stack.Navigator>
     </NavigationContainer>

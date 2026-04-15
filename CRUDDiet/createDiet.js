@@ -1,235 +1,456 @@
-import { View, TextInput, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { useState } from "react";
-import {db} from "../db/firebase.js";
-import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import React, { useState,useEffect } from "react";
+import {
+View,
+TextInput,
+Text,
+StyleSheet,
+ScrollView,
+TouchableOpacity,
+ActivityIndicator,
+Alert
+} from "react-native";
 
-export function CreateDiet(){
+import { db,auth } from "../db/firebase.js";
+import { setDoc, doc, serverTimestamp,getDoc } from "firebase/firestore";
 
-    const uid = "Nn8A81GXWYdmdLVWkGYReqb5Kl92";
+// 🎨 mismos colores del SetObjective
+const BLUE = "#185FA5";
+const BLUE_LIGHT = "#E6F1FB";
+const BLUE_MID = "#378ADD";
 
-    const [name, setName] = useState("");
-    const [calorias, setCalorias] = useState("");
-    const [proteinas, setProteinas] = useState("");
-    const [grasas, setGrasas] = useState("");
-    const [carbohidratos, setCarbohidratos] = useState("");
+export function CreateDiet() {
 
-    const [restricciones, setRestricciones] = useState("");
-    const [prohibidos, setProhibidos] = useState("");
-    const [recomendados, setRecomendados] = useState("");
+const uid = auth.currentUser?.uid;
 
-    const [fechaInicio, setFechaInicio] = useState("");
-    const [fechaFin, setFechaFin] = useState("");
+const [name, setName] = useState("");
+const [calorias, setCalorias] = useState("");
+const [proteinas, setProteinas] = useState("");
+const [grasas, setGrasas] = useState("");
+const [carbohidratos, setCarbohidratos] = useState("");
 
-    const [objetivo, setObjetivo] = useState("");
+const [restricciones, setRestricciones] = useState("");
+const [prohibidos, setProhibidos] = useState("");
+const [recomendados, setRecomendados] = useState("");
 
-    const create = async () =>{
-        try{
+const [fechaInicio, setFechaInicio] = useState("");
+const [fechaFin, setFechaFin] = useState("");
 
-            if (!name){
-                console.log("Introduce un nombre para la dieta");
-                return;
-            }
+const [loading, setLoading] = useState(false);
 
-            const dieta = {
-                name,
-                userId: uid,
-                calorias: Number(calorias),
-                proteinas: Number(proteinas),
-                grasas: Number(grasas),
-                carbohidratos: Number(carbohidratos),
-                restricciones: restricciones.split(",").map(x=>x.trim()),
-                alimentosProhibidos: prohibidos.split(",").map(x=>x.trim()),
-                alimentosRecomendados: recomendados.split(",").map(x=>x.trim()),
-                fechaInicio,
-                fechaFin,
-                objetivo,
-                createdAt: serverTimestamp()
-            };
+// CARGO LOS OBJETIVOS PARA PONER LAS CALORIAS PROTEINAS GRASAS E HIDRATOS EN LOS CAMPOS
 
-            await setDoc(
-                doc(db, `users/${uid}/dietas/${name}`),
-                dieta
-            );
+useEffect(() => {
 
-            console.log("Dieta creada");
+const loadCaloriesAndMacros = async () => {
 
-        } catch(error){
-            console.log(error);
-        }
-    }
+try {
 
-    return(
+const uid = auth.currentUser?.uid;
 
-    <ScrollView contentContainerStyle={styles.container}>
+if (!uid) return;
 
-        <Text style={styles.title}>Crear dieta</Text>
+const snap = await getDoc(doc(db, "objectives", uid));
 
-        <TextInput
-        style={styles.input}
-        placeholder="Nombre de la dieta"
-        value={name}
-        onChangeText={setName}
-        />
+if (!snap.exists()) return;
 
-        <TextInput
-        style={styles.input}
-        placeholder="Calorías diarias"
-        value={calorias}
-        onChangeText={setCalorias}
-        keyboardType="numeric"
-        />
+const data = snap.data();
 
-        <TextInput
-        style={styles.input}
-        placeholder="Proteínas (g)"
-        value={proteinas}
-        onChangeText={setProteinas}
-        keyboardType="numeric"
-        />
+if (!data.dailyCalorieTarget) return;
 
-        <TextInput
-        style={styles.input}
-        placeholder="Grasas (g)"
-        value={grasas}
-        onChangeText={setGrasas}
-        keyboardType="numeric"
-        />
+const calories = data.dailyCalorieTarget;
 
-        <TextInput
-        style={styles.input}
-        placeholder="Carbohidratos (g)"
-        value={carbohidratos}
-        onChangeText={setCarbohidratos}
-        keyboardType="numeric"
-        />
+setCalorias(String(calories));
 
-        <TextInput
-        style={styles.input}
-        placeholder="Restricciones (coma)"
-        value={restricciones}
-        onChangeText={setRestricciones}
-        />
 
-        <TextInput
-        style={styles.input}
-        placeholder="Alimentos prohibidos (coma)"
-        value={prohibidos}
-        onChangeText={setProhibidos}
-        />
+// 🧮 cálculo automático macros
 
-        <TextInput
-        style={styles.input}
-        placeholder="Alimentos recomendados (coma)"
-        value={recomendados}
-        onChangeText={setRecomendados}
-        />
+const protein = Math.round((calories * 0.30) / 4);
 
-        <TextInput
-        style={styles.input}
-        placeholder="Fecha inicio (YYYY-MM-DD)"
-        value={fechaInicio}
-        onChangeText={setFechaInicio}
-        />
+const fat = Math.round((calories * 0.25) / 9);
 
-        <TextInput
-        style={styles.input}
-        placeholder="Fecha fin (YYYY-MM-DD)"
-        value={fechaFin}
-        onChangeText={setFechaFin}
-        />
+const carbs = Math.round((calories * 0.45) / 4);
 
-        <Text style={styles.subtitle}>Objetivo</Text>
 
-        <View style={styles.buttonRow}>
+setProteinas(String(protein));
 
-            <TouchableOpacity style={styles.optionBtn} onPress={()=>setObjetivo("ganar_masa")}>
-                <Text style={styles.btnText}>Ganar masa</Text>
-            </TouchableOpacity>
+setGrasas(String(fat));
 
-            <TouchableOpacity style={styles.optionBtn} onPress={()=>setObjetivo("perder_peso")}>
-                <Text style={styles.btnText}>Perder peso</Text>
-            </TouchableOpacity>
+setCarbohidratos(String(carbs));
 
-            <TouchableOpacity style={styles.optionBtn} onPress={()=>setObjetivo("mantener")}>
-                <Text style={styles.btnText}>Mantener</Text>
-            </TouchableOpacity>
+} catch (error) {
 
-            <TouchableOpacity style={styles.optionBtn} onPress={()=>setObjetivo("definicion")}>
-                <Text style={styles.btnText}>Definición</Text>
-            </TouchableOpacity>
+console.log("Error loading macros:", error);
 
-        </View>
-
-        <TouchableOpacity style={styles.createBtn} onPress={create}>
-            <Text style={styles.createText}>Crear dieta</Text>
-        </TouchableOpacity>
-
-    </ScrollView>
-
-    )
 }
+
+};
+
+loadCaloriesAndMacros();
+
+}, []);
+
+const create = async () => {
+
+if (!name)
+return Alert.alert("Nombre requerido","Introduce un nombre para la dieta");
+
+setLoading(true);
+
+try {
+
+const dieta = {
+
+name,
+userId: uid,
+
+calorias: Number(calorias),
+proteinas: Number(proteinas),
+grasas: Number(grasas),
+carbohidratos: Number(carbohidratos),
+
+restricciones: restricciones.split(",").map(x=>x.trim()),
+alimentosProhibidos: prohibidos.split(",").map(x=>x.trim()),
+alimentosRecomendados: recomendados.split(",").map(x=>x.trim()),
+
+fechaInicio,
+fechaFin,
+
+createdAt: serverTimestamp()
+
+};
+
+await setDoc(
+doc(db, `users/${uid}/dietas/${name}`),
+dieta
+);
+
+Alert.alert("Guardado","Dieta creada correctamente");
+
+} catch(error) {
+
+console.log(error);
+
+Alert.alert("Error","No se pudo crear la dieta");
+
+} finally {
+
+setLoading(false);
+
+}
+
+};
+
+return (
+
+<ScrollView
+style={styles.container}
+contentContainerStyle={styles.content}
+showsVerticalScrollIndicator={false}
+>
+
+{/* HEADER */}
+
+<View style={styles.header}>
+
+<Text style={styles.eyebrow}>Nutrition planner</Text>
+
+<Text style={styles.title}>Create diet</Text>
+
+<Text style={styles.subtitle}>
+Define macros and food preferences
+</Text>
+
+</View>
+
+
+{/* BASIC INFO */}
+
+<View style={styles.section}>
+
+<Text style={styles.sectionLabel}>Basic info</Text>
+
+<TextInput
+style={styles.input}
+placeholder="Diet name"
+placeholderTextColor="#959595"
+value={name}
+onChangeText={setName}
+/>
+
+<View style={styles.inputGroup}>
+
+<Text style={styles.inputLabel}>
+Calories (kcal)
+</Text>
+
+<TextInput
+style={styles.input}
+keyboardType="numeric"
+value={calorias}
+onChangeText={setCalorias}
+/>
+
+</View>
+
+<View style={styles.row}>
+
+{/* PROTEIN */}
+<View style={styles.inputGroup}>
+
+<Text style={styles.inputLabel}>
+Protein (g)
+</Text>
+
+<TextInput
+style={styles.input}
+keyboardType="numeric"
+value={proteinas}
+onChangeText={setProteinas}
+/>
+
+</View>
+
+<View style={{ width: 12 }} />
+
+{/* FAT */}
+<View style={styles.inputGroup}>
+
+<Text style={styles.inputLabel}>
+Fat (g)
+</Text>
+
+<TextInput
+style={styles.input}
+keyboardType="numeric"
+value={grasas}
+onChangeText={setGrasas}
+/>
+
+</View>
+
+</View>
+
+<View style={styles.inputGroup}>
+
+<Text style={styles.inputLabel}>
+Carbs (g)
+</Text>
+
+<TextInput
+style={styles.input}
+keyboardType="numeric"
+value={carbohidratos}
+onChangeText={setCarbohidratos}
+/>
+
+</View>
+
+</View>
+
+
+{/* FOOD SETTINGS */}
+
+<View style={styles.section}>
+
+<Text style={styles.sectionLabel}>Food preferences</Text>
+
+<TextInput
+style={styles.input}
+placeholder="Restrictions (comma separated)"
+placeholderTextColor="#959595"
+value={restricciones}
+onChangeText={setRestricciones}
+/>
+
+<TextInput
+style={styles.input}
+placeholder="Forbidden foods"
+placeholderTextColor="#959595"
+value={prohibidos}
+onChangeText={setProhibidos}
+/>
+
+<TextInput
+style={styles.input}
+placeholder="Recommended foods"
+placeholderTextColor="#959595"
+value={recomendados}
+onChangeText={setRecomendados}
+/>
+
+</View>
+
+
+{/* DATES */}
+
+<View style={styles.section}>
+
+<Text style={styles.sectionLabel}>Timeline</Text>
+
+<View style={styles.row}>
+
+<TextInput
+style={[styles.input,{flex:1}]}
+placeholder="Start date"
+placeholderTextColor="#959595"
+value={fechaInicio}
+onChangeText={setFechaInicio}
+/>
+
+<View style={{width:10}}/>
+
+<TextInput
+style={[styles.input,{flex:1}]}
+placeholder="End date"
+placeholderTextColor="#959595"
+value={fechaFin}
+onChangeText={setFechaFin}
+/>
+
+</View>
+
+</View>
+
+
+{/* BUTTON */}
+
+<TouchableOpacity
+style={[styles.saveBtn, loading && {opacity:.7}]}
+onPress={create}
+disabled={loading}
+>
+
+{loading
+? <ActivityIndicator color="#fff"/>
+: <Text style={styles.saveBtnText}>Create diet</Text>
+}
+
+</TouchableOpacity>
+
+<View style={{height:40}}/>
+
+</ScrollView>
+
+);
+
+}
+
+
+// 🎨 styles clonados del SetObjective
 
 const styles = StyleSheet.create({
 
-container:{
-padding:20,
-backgroundColor:"#000",
-minHeight:"100%"
+container:{ flex:1, backgroundColor:"#FFFFFF" },
+
+content:{ padding:20, paddingTop:28 },
+
+
+header:{ marginBottom:28 },
+
+eyebrow:{
+fontSize:11,
+fontWeight:"600",
+color:BLUE_MID,
+letterSpacing:.9,
+textTransform:"uppercase"
 },
 
 title:{
-fontSize:24,
-fontWeight:"bold",
-marginBottom:20,
-color:"#ffffff"
+fontSize:26,
+fontWeight:"700",
+marginTop:4
 },
 
 subtitle:{
-marginTop:10,
-marginBottom:10,
-fontSize:16,
-fontWeight:"600",
-color:"#ffffff"
+fontSize:14,
+color:"#888"
 },
+
+
+section:{ marginBottom:24 },
+
+sectionLabel:{
+fontSize:11,
+fontWeight:"600",
+color:"#999",
+letterSpacing:.9,
+textTransform:"uppercase",
+marginBottom:10
+},
+inputGroup:{
+flex:1
+},
+
+inputLabel:{
+fontSize:11,
+fontWeight:"600",
+color:"#999",
+letterSpacing:0.9,
+textTransform:"uppercase",
+marginBottom:6
+},
+
+
+row:{ flexDirection:"row" },
+
 
 input:{
-backgroundColor:"#1e3a8a",
-borderWidth:1,
-borderColor:"#3b82f6",
-padding:10,
-marginBottom:10,
-borderRadius:8,
-color:"#ffffff"
-},
-
-buttonRow:{
-flexDirection:"row",
-flexWrap:"wrap",
-gap:10,
-marginBottom:20
-},
-
-optionBtn:{
-backgroundColor:"#2563eb",
-padding:10,
-borderRadius:8
-},
-
-btnText:{
-fontWeight:"500",
-color:"#ffffff"
-},
-
-createBtn:{
-backgroundColor:"#3b82f6",
-padding:15,
+backgroundColor:"#F5F5F5",
 borderRadius:10,
+borderWidth:1,
+borderColor:"#E5E5E5",
+color:"#0A0A0A",
+fontSize:16,
+fontWeight:"600",
+paddingHorizontal:14,
+paddingVertical:11,
+marginBottom:10
+},
+
+
+goalRow:{
+flexDirection:"row",
+gap:8
+},
+
+goalCard:{
+flex:1,
+borderRadius:10,
+borderWidth:1,
+borderColor:"#E5E5E5",
+backgroundColor:"#FAFAFA",
+padding:12,
 alignItems:"center"
 },
 
-createText:{
-color:"#ffffff",
-fontWeight:"bold"
+goalCardActive:{
+borderColor:BLUE_MID,
+borderWidth:1.5,
+backgroundColor:BLUE_LIGHT
+},
+
+goalLabel:{
+fontSize:12,
+fontWeight:"600",
+color:"#333"
+},
+
+goalLabelActive:{
+color:BLUE
+},
+
+
+saveBtn:{
+borderRadius:12,
+paddingVertical:16,
+alignItems:"center",
+backgroundColor:BLUE
+},
+
+saveBtnText:{
+color:"#FFF",
+fontSize:16,
+fontWeight:"700"
 }
 
 });

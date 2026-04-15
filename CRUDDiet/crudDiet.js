@@ -21,7 +21,7 @@ export function CrudDiet({ navigation }) {
 
         <TouchableOpacity
           style={styles.boton}
-          onPress={() => navigation.navigate("CreateDiet")}
+          onPress={() => navigation.navigate("SetObjective")}
         >
           <Ionicons name="add-circle" size={30} color="white" />
           <Text style={styles.texto}>Crear dieta</Text>

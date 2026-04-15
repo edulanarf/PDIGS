@@ -319,9 +319,7 @@ export function SetObjective({ navigation }) {
         },
         { merge: true }
       );
-      Alert.alert("Guardado 🎯", "Tu objetivo ha sido guardado.", [
-        { text: "Ir al inicio", onPress: () => navigation.navigate("Home") },
-      ]);
+      navigation.navigate("CreateDiet");
     } catch (e) {
       Alert.alert("Error", "No se pudo guardar. Inténtalo de nuevo.");
       console.error(e);
@@ -410,7 +408,7 @@ export function SetObjective({ navigation }) {
                   onChangeText={setCurrentWeight}
                   keyboardType="decimal-pad"
                   placeholder="80"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#959595"
                   maxLength={6}
                 />
               </View>
@@ -422,7 +420,7 @@ export function SetObjective({ navigation }) {
                   onChangeText={setTargetWeight}
                   keyboardType="decimal-pad"
                   placeholder="72"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#959595"
                   maxLength={6}
                 />
               </View>
@@ -441,7 +439,7 @@ export function SetObjective({ navigation }) {
                   onChangeText={setHeight}
                   keyboardType="decimal-pad"
                   placeholder="175"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#959595"
                   maxLength={5}
                 />
               </View>
@@ -453,7 +451,7 @@ export function SetObjective({ navigation }) {
                   onChangeText={setAge}
                   keyboardType="number-pad"
                   placeholder="28"
-                  placeholderTextColor="#666"
+                  placeholderTextColor="#959595"
                   maxLength={3}
                 />
               </View>

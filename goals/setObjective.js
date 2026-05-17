@@ -235,6 +235,7 @@ export function SetObjective({ navigation }) {
   const [loading,       setLoading]       = useState(false);
   const [fetchingData,  setFetchingData]  = useState(true);
   const [showAuth,      setShowAuth]      = useState(false);
+  const [errors,        setErrors]        = useState({});
 
   const fadeAnim  = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
@@ -269,6 +270,11 @@ export function SetObjective({ navigation }) {
     }
   }
 
+  // Limpiar error de un campo al editarlo
+  function clearError(field) {
+    setErrors((prev) => ({ ...prev, [field]: null }));
+  }
+
   // Derived values
   const cw   = parseFloat(currentWeight) || 0;
   const tw   = parseFloat(targetWeight)  || 0;
@@ -280,19 +286,26 @@ export function SetObjective({ navigation }) {
   const weeks         = tw && cw ? weeksToGoal(cw, tw, goal.weeklyChange) : null;
 
   function validate() {
+    const newErrors = {};
+
     if (!cw || cw < 20 || cw > 300)
-      return Alert.alert("Peso inválido", "Introduce un peso actual entre 20 y 300 kg.") || false;
+      newErrors.currentWeight = "Enter a weight between 20 and 300 kg.";
+
     if (!tw || tw < 20 || tw > 300)
-      return Alert.alert("Peso inválido", "Introduce un peso objetivo entre 20 y 300 kg.") || false;
-    if (selectedGoal === "lose" && tw >= cw)
-      return Alert.alert("Meta inválida", "El peso objetivo debe ser menor al actual.") || false;
-    if (selectedGoal === "gain" && tw <= cw)
-      return Alert.alert("Meta inválida", "El peso objetivo debe ser mayor al actual.") || false;
+      newErrors.targetWeight = "Enter a weight between 20 and 300 kg.";
+    else if (selectedGoal === "lose" && tw >= cw)
+      newErrors.targetWeight = "Target must be less than current weight.";
+    else if (selectedGoal === "gain" && tw <= cw)
+      newErrors.targetWeight = "Target must be greater than current weight.";
+
     if (!h || h < 100 || h > 250)
-      return Alert.alert("Altura inválida", "Introduce una altura entre 100 y 250 cm.") || false;
+      newErrors.height = "Enter a height between 100 and 250 cm.";
+
     if (!a || a < 10 || a > 120)
-      return Alert.alert("Edad inválida", "Introduce una edad entre 10 y 120.") || false;
-    return true;
+      newErrors.age = "Enter an age between 10 and 120.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   }
 
   async function doSave() {
@@ -331,7 +344,7 @@ export function SetObjective({ navigation }) {
   function handleSave() {
     if (!validate()) return;
     if (!auth.currentUser) {
-      setShowAuth(true); // abre el modal si no hay sesión
+      setShowAuth(true);
     } else {
       doSave();
     }
@@ -403,26 +416,36 @@ export function SetObjective({ navigation }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Current</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.currentWeight && styles.inputError]}
                   value={currentWeight}
-                  onChangeText={setCurrentWeight}
+                  onChangeText={(v) => { setCurrentWeight(v); clearError("currentWeight"); }}
                   keyboardType="decimal-pad"
                   placeholder="80"
                   placeholderTextColor="#959595"
                   maxLength={6}
                 />
+                {errors.currentWeight && (
+                  <Text style={styles.errorText}>⚠ {errors.currentWeight}</Text>
+                )}
               </View>
               <View style={[styles.inputGroup, { marginLeft: 12 }]}>
                 <Text style={styles.inputLabel}>Target</Text>
                 <TextInput
-                  style={[styles.input, styles.inputAccent]}
+                  style={[
+                    styles.input,
+                    styles.inputAccent,
+                    errors.targetWeight && styles.inputError,
+                  ]}
                   value={targetWeight}
-                  onChangeText={setTargetWeight}
+                  onChangeText={(v) => { setTargetWeight(v); clearError("targetWeight"); }}
                   keyboardType="decimal-pad"
                   placeholder="72"
                   placeholderTextColor="#959595"
                   maxLength={6}
                 />
+                {errors.targetWeight && (
+                  <Text style={styles.errorText}>⚠ {errors.targetWeight}</Text>
+                )}
               </View>
             </View>
           </View>
@@ -434,26 +457,32 @@ export function SetObjective({ navigation }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Height (cm)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.height && styles.inputError]}
                   value={height}
-                  onChangeText={setHeight}
+                  onChangeText={(v) => { setHeight(v); clearError("height"); }}
                   keyboardType="decimal-pad"
                   placeholder="175"
                   placeholderTextColor="#959595"
                   maxLength={5}
                 />
+                {errors.height && (
+                  <Text style={styles.errorText}>⚠ {errors.height}</Text>
+                )}
               </View>
               <View style={[styles.inputGroup, { marginLeft: 12 }]}>
                 <Text style={styles.inputLabel}>Age</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.age && styles.inputError]}
                   value={age}
-                  onChangeText={setAge}
+                  onChangeText={(v) => { setAge(v); clearError("age"); }}
                   keyboardType="number-pad"
                   placeholder="28"
                   placeholderTextColor="#959595"
                   maxLength={3}
                 />
+                {errors.age && (
+                  <Text style={styles.errorText}>⚠ {errors.age}</Text>
+                )}
               </View>
             </View>
 
@@ -554,7 +583,7 @@ export function SetObjective({ navigation }) {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Auth Modal — se muestra si no hay sesión al guardar */}
+      {/* Auth Modal */}
       <AuthModal
         visible={showAuth}
         onClose={() => setShowAuth(false)}
@@ -571,9 +600,9 @@ export function SetObjective({ navigation }) {
 //  STYLES — SetObjective
 // ─────────────────────────────────────────────
 
-const BLUE      = "#185FA5";
+const BLUE       = "#185FA5";
 const BLUE_LIGHT = "#E6F1FB";
-const BLUE_MID  = "#378ADD";
+const BLUE_MID   = "#378ADD";
 
 const styles = StyleSheet.create({
   container: {
@@ -675,6 +704,17 @@ const styles = StyleSheet.create({
     backgroundColor: BLUE_LIGHT,
     color: BLUE,
   },
+  inputError: {
+    borderColor: "#E24B4A",
+    borderWidth: 1.5,
+    backgroundColor: "#FFF0F0",
+  },
+  errorText: {
+    fontSize: 12,
+    color: "#E24B4A",
+    marginTop: 5,
+    marginLeft: 2,
+  },
 
   // Sex
   sexBtn: {
@@ -703,11 +743,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "transparent",
   },
-  activityRowActive:   { borderColor: BLUE_MID, backgroundColor: BLUE_LIGHT },
-  activityLabel:       { color: "#333", fontWeight: "600", fontSize: 13 },
-  activityLabelActive: { color: BLUE },
-  activityDetail:      { color: "#AAA", fontSize: 11, marginTop: 1 },
-  activityDetailActive:{ color: BLUE_MID },
+  activityRowActive:    { borderColor: BLUE_MID, backgroundColor: BLUE_LIGHT },
+  activityLabel:        { color: "#333", fontWeight: "600", fontSize: 13 },
+  activityLabelActive:  { color: BLUE },
+  activityDetail:       { color: "#AAA", fontSize: 11, marginTop: 1 },
+  activityDetailActive: { color: BLUE_MID },
   activeDot: {
     width: 8,
     height: 8,
@@ -771,8 +811,6 @@ const authStyles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: "#FFFFFF",
-    borderTopWidth: 2,
-    borderTopColor: BLUE_MID,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     padding: 24,
@@ -817,17 +855,16 @@ const authStyles = StyleSheet.create({
   },
 
   submitBtn: {
-  borderRadius: 12,
-  paddingVertical: 14,
-  alignItems: "center",
-  backgroundColor: BLUE,
-  marginTop: 6,
-},
-
-submitText: {
-  color: "#FFF",
-  fontSize: 15,
-  fontWeight: "700",
-  letterSpacing: 0.2,
-},
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    backgroundColor: BLUE,
+    marginTop: 6,
+  },
+  submitText: {
+    color: "#FFF",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.2,
+  },
 });
